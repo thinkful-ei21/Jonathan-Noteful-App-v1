@@ -3,6 +3,7 @@
 // INSERT EXPRESS APP CODE HERE...
 const express = require('express');
 const data = require('./db/notes');
+const {PORT} = require('./config');
 const app = express();
 
 // ADD STATIC SERVER HERE
@@ -22,7 +23,7 @@ app.get('/api/notes/:id', (req , res) => {
 });
 
 
-app.listen(8080, function() {
+app.listen(PORT, function() {
     console.info(`server listening on ${this.address().port}`);
 }).on('error', err => {
     console.error(err);
