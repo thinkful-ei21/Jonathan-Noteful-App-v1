@@ -13,16 +13,34 @@ const app = express();
 app.use(logger);
 app.use(express.static('public'));
 
-app.get('/api/notes', (req , res) => {
-    if(req.query.searchTerm) {
-        let search = req.query.searchTerm.toLowerCase();
-        res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search))); 
-    }
-    res.json(data);
+// app.get('/api/notes', (req , res) => {
+//     if(req.query.searchTerm) {
+//         let search = req.query.searchTerm.toLowerCase();
+//         res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search))); 
+//     }
+//     res.json(data);
+// });
+
+app.get('/api/notes', (req, res, next) => {
+    const { searchTerm } = req.query;
+  
+    notes.filter(searchTerm, (err, list) => {
+      if (err) {
+        return next(err); // goes to error handler
+      }
+      res.json(list); // responds with filtered array
+    });
 });
 
 app.get('/api/notes/:id', (req , res) => {
-    res.json(data.find(item => item.id === Number(req.params.id)));
+    const { id } = req.params.id;
+
+    notes.find(id, (err, item) => {
+        if(err) {
+            return next(err);
+        }
+        res.json(data.find(item => item.id === Number(req.params.id)));
+    });
 });
 
 app.use(function (req, res, next) {
