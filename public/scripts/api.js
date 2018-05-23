@@ -32,5 +32,4 @@ const api = {
       success: callback
     });
   }
-
 };
