@@ -17,18 +17,19 @@ router.get('/notes', (req, res, next) => {
             let search = req.query.searchTerm.toLowerCase();
             res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search))); 
         }
-        res.json(data);    
+        res.json(list);    
     });
 });
 
 router.get('/notes/:id', (req , res) => {
-    const { id } = req.params.id;
+    const id = req.params.id;
 
     notes.find(id, (err, item) => {
         if(err) {
             return next(err);
         }
-        res.json(data.find(item => item.id === Number(req.params.id)));
+        res.json(item);
+        //data.find(item => item.id === Number(req.params.id))
     });
 });
 
@@ -80,6 +81,17 @@ router.post('/notes', (req, res, next) =>{
     });
 });
 
+router.delete('/notes/:id', (req, res, next) => {
+    const id = req.params.id;
+    notes.delete(id, (err, item) => {
+        if (err) {
+            return next(err);
+        }
+        if (item) {
+            res.json(item);
+        }
+    });
+});
 
 
 module.exports = router;
