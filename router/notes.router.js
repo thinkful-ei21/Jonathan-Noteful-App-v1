@@ -8,30 +8,60 @@ const notes = simDB.initialize(data);
 
 router.get('/notes', (req, res, next) => {
     const { searchTerm } = req.query;
-  
-    notes.filter(searchTerm, (err, list) => {
-        if (err) {
-            return next(err); // goes to error handler
-        }
-        if(req.query.searchTerm) {
-            let search = req.query.searchTerm.toLowerCase();
-            res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search))); 
-        }
-        res.json(list);    
-    });
+    
+    notes.filter(searchTerm)
+        .then(list => {
+            if(req.query.searchTerm) {
+                let search = req.query.searchTerm.toLowerCase();
+                res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search)));
+            }
+            if(!req.query.searchTerm) {
+                res.json(list);
+            }
+            else {
+                next();
+            }
+        })
+        .catch(err => {
+            next(err)
+        });
+    // notes.filter(searchTerm, (err, list) => {
+    //     if (err) {
+    //         return next(err); // goes to error handler
+    //     }
+    //     if(req.query.searchTerm) {
+    //         let search = req.query.searchTerm.toLowerCase();
+    //         res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search))); 
+    //     }
+    //     res.json(list);    
+    // });
 });
 
-router.get('/notes/:id', (req , res) => {
+router.get('/notes/:id', (req , res, next) => {
     const id = req.params.id;
 
-    notes.find(id, (err, item) => {
-        if(err) {
-            return next(err);
-        }
-        res.json(item);
-        //data.find(item => item.id === Number(req.params.id))
-    });
+    notes.find(id)
+        .then(item => {
+            if (item) {
+                res.json(item);
+            } else {
+                next();
+            }
+        })
+        .catch(err => {
+            next(err)
+        });
 });
+
+// notes.find(id, (err, item) => {
+//     if (err) {
+//       return next(err);
+//     }
+//     if (item) {
+//       res.json(item);
+//     } else {
+//       next();
+//     }
 
 router.put('/notes/:id', (req, res, next) => {
     const id = req.params.id;
@@ -46,16 +76,17 @@ router.put('/notes/:id', (req, res, next) => {
         }
     });
   
-    notes.update(id, updateObj, (err, item) => {
-        if (err) {
-            return next(err);
-        }
-        if (item) {
-            res.json(item);
-        } else {
-            next();
-        }
-    });
+    notes.find(id)
+        .then(item => {
+            if (item) {
+                res.json(item);
+            } else {
+                next();
+            }
+        })
+        .catch(err => {
+            next(err)
+        });
 });
 
 router.post('/notes', (req, res, next) =>{
@@ -68,29 +99,42 @@ router.post('/notes', (req, res, next) =>{
         err.status = 400;
         return next(err);
     }
-
-    notes.create(newItem, (err, item) => {
-        if (err) {
-            return next(err);
-        }
-        if (item) {
-            res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-        } else {
-            next();
-        }
-    });
+    notes.create(newItem)
+        .then(item => {
+            if (item) {
+                res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+            } else {
+                next();
+            }
+        })
+        .catch(err => {
+            next(err)
+        });
+    // notes.create(newItem, (err, item) => {
+    //     if (err) {
+    //         return next(err);
+    //     }
+    //     if (item) {
+    //         res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+    //     } else {
+    //         next();
+    //     }
+    // });
 });
 
 router.delete('/notes/:id', (req, res, next) => {
     const id = req.params.id;
-    notes.delete(id, (err, item) => {
-        if (err) {
-            return next(err);
-        }
-        if (item) {
-            res.json(item);
-        }
-    });
+    notes.delete(id)
+        .then(item => {
+            if (item) {
+                res.sendStatus(204);
+            } else {
+                next();
+            }
+        })
+        .catch(err => {
+            next(err)
+        });
 });
 
 
