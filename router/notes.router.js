@@ -13,7 +13,7 @@ router.get('/notes', (req, res, next) => {
         .then(list => {
             if(req.query.searchTerm) {
                 let search = req.query.searchTerm.toLowerCase();
-                res.json(data.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search)));
+                res.json(list.filter(item => item.title.toLowerCase().includes(search)||item.content.toLowerCase().includes(search)));
             }
             if(!req.query.searchTerm) {
                 res.json(list);
