@@ -1,6 +1,6 @@
 /* global $ store api */
 'use strict';
-
+// eslint-disable-next-line no-unused-vars
 const noteful = (function () {
 
   function render() {
@@ -44,9 +44,9 @@ const noteful = (function () {
 
       api.details(noteId)
         .then(response => {
-        store.currentNote = response;
-        render();
-      });
+          store.currentNote = response;
+          render();
+        });
     });
   }
 
@@ -81,33 +81,24 @@ const noteful = (function () {
       if (noteObj.id) {
 
         api.update(store.currentNote.id, noteObj)
-         .then(response => {
-          store.notes = response;
-          
-
-          api.search(store.currentSearchTerm)
+          .then((item) => {
+            store.currentNote = item;
+            return api.search(store.currentSearchTerm);
+          }) 
           .then(response => {
             store.notes = response;
-            noteful.render();
+            render();
           });
-
-        });
 
       } else {
 
         api.create(noteObj)
-        .then(response => {
-          store.notes = response;
-
-          api.search(store.currentSearchTerm)
+          .then(() => api.search(store.currentSearchTerm))
           .then(response => {
             store.notes = response;
-            noteful.render();
+            render();
           });
-
-        });
       }
-
     });
   }
 
@@ -128,15 +119,13 @@ const noteful = (function () {
       const noteId = getNoteIdFromElement(event.currentTarget);
 
       api.remove(noteId)
-        .then(() => {
-            return api.search(store.currentSearchTerm) 
-        })
+        .then(() => api.search(store.currentSearchTerm))
         .then(response => {
-            store.notes = response;
-            if (noteId === store.currentNote.id) {
-                store.currentNote = {};
-            }
-        render();
+          store.notes = response;
+          if (noteId === store.currentNote.id) {
+            store.currentNote = {};
+          }
+          render();
         });
     });
   }
@@ -144,7 +133,6 @@ const noteful = (function () {
   function bindEventListeners() {
     handleNoteItemClick();
     handleNoteSearchSubmit();
-
     handleNoteFormSubmit();
     handleNoteStartNewSubmit();
     handleNoteDeleteClick();
@@ -152,8 +140,8 @@ const noteful = (function () {
 
   // This object contains the only exposed methods from this module:
   return {
-    render: render,
-    bindEventListeners: bindEventListeners,
+    render,
+    bindEventListeners,
   };
 
 }());

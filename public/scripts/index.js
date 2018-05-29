@@ -8,5 +8,5 @@ $(document).ready(function () {
     .then(response => {
       store.notes = response;
       noteful.render();
-  });
+    });
 });
